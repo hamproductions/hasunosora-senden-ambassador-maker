@@ -1,0 +1,565 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hasu Frame Viral Maker</title>
+  <style>
+    :root {
+      --bg0: #080b16;
+      --bg1: #0f1b3a;
+      --bg2: #3b0e35;
+      --panel: #0f1324cc;
+      --line: #2a365f;
+      --text: #f4f7ff;
+      --muted: #99a6d9;
+      --primary: #ff2e92;
+      --primary2: #ff6f61;
+      --secondary: #48c5ff;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Avenir Next", "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(1000px 600px at 10% 0%, #2f1c6c 0%, transparent 62%),
+        radial-gradient(900px 600px at 100% 100%, #00425e 0%, transparent 60%),
+        linear-gradient(155deg, var(--bg0) 0%, var(--bg1) 50%, var(--bg2) 100%);
+      padding: 16px;
+    }
+    .app {
+      max-width: 1220px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 350px 1fr;
+      gap: 14px;
+    }
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 14px;
+      backdrop-filter: blur(8px);
+    }
+    h1 {
+      font-size: 24px;
+      line-height: 1.1;
+      margin: 2px 0 8px;
+      letter-spacing: .01em;
+    }
+    .lead {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+      margin: 0;
+    }
+    .grid {
+      display: grid;
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .grid.two {
+      grid-template-columns: 1fr 1fr;
+    }
+    .langbar {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .lbl {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+    input[type="file"],
+    input[type="range"],
+    button {
+      width: 100%;
+    }
+    button {
+      border: 0;
+      border-radius: 11px;
+      padding: 12px;
+      color: #fff;
+      font-weight: 700;
+      cursor: pointer;
+      letter-spacing: .01em;
+    }
+    .primary {
+      background: linear-gradient(115deg, var(--primary), var(--primary2));
+    }
+    .secondary {
+      background: linear-gradient(115deg, #2f70ff, var(--secondary));
+    }
+    .neutral {
+      background: linear-gradient(115deg, #2d324a, #3e4769);
+    }
+    .picker {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+      max-height: 300px;
+      overflow: auto;
+      padding-right: 2px;
+    }
+    .pick {
+      border: 2px solid transparent;
+      border-radius: 10px;
+      padding: 2px;
+      background: #11152a;
+      cursor: pointer;
+    }
+    .pick.active {
+      border-color: var(--secondary);
+      box-shadow: 0 0 0 2px #48c5ff40;
+    }
+    .pick img {
+      width: 100%;
+      display: block;
+      border-radius: 7px;
+      aspect-ratio: 1;
+      object-fit: cover;
+    }
+    .stage {
+      min-height: 560px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(180deg, #0a1022, #0c1226);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 14px;
+    }
+    canvas {
+      width: min(78vw, 760px);
+      max-width: 100%;
+      aspect-ratio: 1;
+      border-radius: 14px;
+      border: 1px solid #34406b;
+      background: #090d1a;
+      box-shadow: 0 20px 58px #0000006b;
+      touch-action: none;
+    }
+    details {
+      border: 1px solid #32406d;
+      border-radius: 10px;
+      padding: 8px 10px;
+      background: #11172d;
+    }
+    summary {
+      cursor: pointer;
+      font-size: 12px;
+      color: #bdd9ff;
+      font-weight: 700;
+    }
+    .note {
+      font-size: 12px;
+      color: var(--muted);
+      margin: 2px 0 0;
+      line-height: 1.4;
+    }
+    .announce {
+      border: 1px solid #354372;
+      background: #121a32;
+      border-radius: 10px;
+      padding: 10px;
+    }
+    .announce h3 {
+      margin: 0;
+      font-size: 14px;
+      line-height: 1.35;
+    }
+    .announce p {
+      margin: 8px 0 0;
+      font-size: 12px;
+      color: #bfd2ff;
+      line-height: 1.45;
+    }
+    @media (max-width: 980px) {
+      .app { grid-template-columns: 1fr; }
+      .stage { min-height: auto; }
+      canvas { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <section class="card">
+      <h1 data-i18n="title">Hasu Frame Viral Maker</h1>
+      <p class="lead" data-i18n="lead">0-effort flow: upload, pick frame, download PNG, post to X. 12 presets included: 1 original + 11 masked variants.</p>
+
+      <div class="langbar">
+        <button id="lang-ja" type="button" class="neutral">日本語</button>
+        <button id="lang-en" type="button" class="neutral">English</button>
+      </div>
+
+      <div class="grid announce">
+        <h3 data-i18n="announceTitle">映画公開30日前を記念して、SNSアイコン&フレームの配布がスタート！</h3>
+        <p data-i18n="announceBody">映画公開30日前記念の公式配布素材。#蓮ノ空宣伝アンバサダー を付けて投稿できます。</p>
+      </div>
+
+      <div class="grid">
+        <div>
+          <div class="lbl" data-i18n="step1">1) Upload image</div>
+          <input id="upload" type="file" accept="image/png,image/jpeg,image/webp" />
+        </div>
+      </div>
+
+      <div class="grid two">
+        <button id="random" type="button" class="neutral" data-i18n="randomBtn">Random Frame</button>
+        <button id="reset" type="button" class="neutral" data-i18n="resetBtn">Reset Position</button>
+      </div>
+
+      <div class="grid two">
+        <button id="download" type="button" class="primary" data-i18n="downloadBtn">Download PNG (Max)</button>
+        <button id="share" type="button" class="secondary" data-i18n="shareBtn">Share To X</button>
+      </div>
+
+      <p class="note" data-i18n="shareNote">X web share can’t attach files automatically. It opens tweet text so you can attach the PNG in one tap.</p>
+
+      <div class="grid">
+        <div class="lbl" data-i18n="step2">2) Pick frame style</div>
+        <div id="picker" class="picker"></div>
+      </div>
+
+      <div class="grid">
+        <details>
+          <summary data-i18n="advanced">Advanced (optional)</summary>
+          <div class="grid" style="margin-top:8px">
+            <div>
+              <div class="lbl" data-i18n="scale">Scale</div>
+              <input id="scale" type="range" min="0.4" max="3" step="0.01" value="1" />
+            </div>
+            <div>
+              <div class="lbl" data-i18n="rotate">Rotate</div>
+              <input id="rotate" type="range" min="-180" max="180" step="1" value="0" />
+            </div>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <section class="card stage">
+      <canvas id="canvas" width="1600" height="1600"></canvas>
+      <p class="note" data-i18n="dragHint">Drag image to reposition.</p>
+    </section>
+  </main>
+
+  <script>
+    const SOURCE_PNGS = __FRAME_DATA__;
+    const OUTPUT_SIZE = 1600;
+    const CIRCLE_RADIUS = OUTPUT_SIZE * 0.48;
+
+    const upload = document.getElementById('upload');
+    const langJaBtn = document.getElementById('lang-ja');
+    const langEnBtn = document.getElementById('lang-en');
+    const scaleInput = document.getElementById('scale');
+    const rotateInput = document.getElementById('rotate');
+    const resetBtn = document.getElementById('reset');
+    const randomBtn = document.getElementById('random');
+    const downloadBtn = document.getElementById('download');
+    const shareBtn = document.getElementById('share');
+    const picker = document.getElementById('picker');
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+
+    const state = {
+      locale: /^ja/i.test(navigator.language) ? 'ja' : 'en',
+      img: null,
+      x: OUTPUT_SIZE / 2,
+      y: OUTPUT_SIZE / 2,
+      scale: 1,
+      rotate: 0,
+      frameIndex: 0,
+    };
+
+    const I18N = {
+      ja: {
+        title: '蓮ノ空 フレームメーカー',
+        lead: '最短3タップ: 画像をアップロード → フレーム選択 → PNG保存 → X投稿。12種類(公式1種 + マスク11種)。',
+        announceTitle: '映画公開30日前を記念して、SNSアイコン&フレームの配布がスタート！',
+        announceBody: '映画 ラブライブ！蓮ノ空女学院スクールアイドルクラブ Bloom Garden Party の公開30日前を記念した公式素材です。ハッシュタグ #蓮ノ空宣伝アンバサダー で投稿できます。',
+        step1: '1) 画像をアップロード',
+        randomBtn: 'ランダム選択',
+        resetBtn: '位置リセット',
+        downloadBtn: 'PNG保存(最高品質)',
+        shareBtn: 'Xでシェア',
+        shareNote: 'Xの仕様で画像は自動添付されません。投稿画面を開くので、保存したPNGを添付してください。',
+        step2: '2) フレームを選ぶ',
+        advanced: '詳細調整(任意)',
+        scale: '拡大縮小',
+        rotate: '回転',
+        dragHint: 'ドラッグで位置調整',
+        frameLabel: 'フレーム',
+        tweet: '蓮ノ空フレームを作成しました #蓮ノ空宣伝アンバサダー #lovelive',
+        filePrefix: 'hasu-frame-ja',
+      },
+      en: {
+        title: 'Hasu Frame Viral Maker',
+        lead: 'Zero-effort flow: upload image, pick frame, download PNG, post to X. 12 presets included (1 original + 11 masked).',
+        announceTitle: '30 Days Before The Movie: Official SNS Icons & Frame Released',
+        announceBody: 'Official assets for the 30-days-before-release campaign of Love Live! Hasunosora Girls\' High School Idol Club Bloom Garden Party. Post with #蓮ノ空宣伝アンバサダー.',
+        step1: '1) Upload image',
+        randomBtn: 'Random Frame',
+        resetBtn: 'Reset Position',
+        downloadBtn: 'Download PNG (Max)',
+        shareBtn: 'Share To X',
+        shareNote: 'X web intent cannot auto-attach files. It opens tweet text so you can attach the downloaded PNG.',
+        step2: '2) Pick frame style',
+        advanced: 'Advanced (optional)',
+        scale: 'Scale',
+        rotate: 'Rotate',
+        dragHint: 'Drag image to reposition',
+        frameLabel: 'Frame',
+        tweet: 'I made this with Hasu Frame Viral Maker #蓮ノ空宣伝アンバサダー #lovelive',
+        filePrefix: 'hasu-frame-en',
+      },
+    };
+
+    function t(key) {
+      return I18N[state.locale][key] ?? I18N.en[key] ?? key;
+    }
+
+    function applyLocale() {
+      document.documentElement.lang = state.locale;
+      for (const el of document.querySelectorAll('[data-i18n]')) {
+        const key = el.dataset.i18n;
+        el.textContent = t(key);
+      }
+      document.title = t('title');
+      langJaBtn.classList.toggle('secondary', state.locale === 'ja');
+      langEnBtn.classList.toggle('secondary', state.locale === 'en');
+      langJaBtn.classList.toggle('neutral', state.locale !== 'ja');
+      langEnBtn.classList.toggle('neutral', state.locale !== 'en');
+      buildPicker();
+      render();
+    }
+
+    let frameVariants = [];
+    let dragging = false;
+    let dx = 0;
+    let dy = 0;
+
+    function loadImage(src) {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = reject;
+        img.src = src;
+      });
+    }
+
+    function makeMaskedFrame(alphaMaskImage, sourceImage) {
+      const c = document.createElement('canvas');
+      c.width = OUTPUT_SIZE;
+      c.height = OUTPUT_SIZE;
+      const g = c.getContext('2d');
+      g.drawImage(sourceImage, 0, 0, OUTPUT_SIZE, OUTPUT_SIZE);
+      const sourceData = g.getImageData(0, 0, OUTPUT_SIZE, OUTPUT_SIZE);
+
+      const ac = document.createElement('canvas');
+      ac.width = OUTPUT_SIZE;
+      ac.height = OUTPUT_SIZE;
+      const ag = ac.getContext('2d');
+      ag.drawImage(alphaMaskImage, 0, 0, OUTPUT_SIZE, OUTPUT_SIZE);
+      const alphaData = ag.getImageData(0, 0, OUTPUT_SIZE, OUTPUT_SIZE);
+
+      const s = sourceData.data;
+      const a = alphaData.data;
+      for (let i = 0; i < s.length; i += 4) {
+        s[i + 3] = Math.round((s[i + 3] * a[i + 3]) / 255);
+      }
+
+      g.putImageData(sourceData, 0, 0);
+      return c;
+    }
+
+    async function makeFrames() {
+      const loaded = await Promise.all(SOURCE_PNGS.map(loadImage));
+      const alphaMask = loaded[0];
+      const variants = [];
+
+      const first = document.createElement('canvas');
+      first.width = OUTPUT_SIZE;
+      first.height = OUTPUT_SIZE;
+      first.getContext('2d').drawImage(alphaMask, 0, 0, OUTPUT_SIZE, OUTPUT_SIZE);
+      variants.push(first);
+
+      for (let i = 1; i < loaded.length; i++) {
+        variants.push(makeMaskedFrame(alphaMask, loaded[i]));
+      }
+
+      return variants;
+    }
+
+    function drawUser() {
+      ctx.fillStyle = '#0e111d';
+      ctx.fillRect(0, 0, OUTPUT_SIZE, OUTPUT_SIZE);
+      if (!state.img) return;
+
+      const fit = Math.max(OUTPUT_SIZE / state.img.width, OUTPUT_SIZE / state.img.height);
+      const w = state.img.width * fit;
+      const h = state.img.height * fit;
+
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(OUTPUT_SIZE / 2, OUTPUT_SIZE / 2, CIRCLE_RADIUS, 0, Math.PI * 2);
+      ctx.clip();
+      ctx.translate(state.x, state.y);
+      ctx.rotate((state.rotate * Math.PI) / 180);
+      ctx.scale(state.scale, state.scale);
+      ctx.drawImage(state.img, -w / 2, -h / 2, w, h);
+      ctx.restore();
+    }
+
+    function render() {
+      ctx.clearRect(0, 0, OUTPUT_SIZE, OUTPUT_SIZE);
+      drawUser();
+      const frame = frameVariants[state.frameIndex];
+      if (frame) ctx.drawImage(frame, 0, 0);
+    }
+
+    function setActive() {
+      for (const el of picker.querySelectorAll('.pick')) {
+        el.classList.toggle('active', Number(el.dataset.i) === state.frameIndex);
+      }
+    }
+
+    function buildPicker() {
+      picker.innerHTML = '';
+      frameVariants.forEach((frame, i) => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'pick' + (i === state.frameIndex ? ' active' : '');
+        b.dataset.i = String(i);
+        const img = document.createElement('img');
+        img.src = frame.toDataURL('image/png');
+        img.alt = `${t('frameLabel')} ${i + 1}`;
+        b.appendChild(img);
+        b.addEventListener('click', () => {
+          state.frameIndex = i;
+          setActive();
+          render();
+        });
+        picker.appendChild(b);
+      });
+    }
+
+    function normPoint(e) {
+      const r = canvas.getBoundingClientRect();
+      return {
+        x: ((e.clientX - r.left) / r.width) * OUTPUT_SIZE,
+        y: ((e.clientY - r.top) / r.height) * OUTPUT_SIZE,
+      };
+    }
+
+    canvas.addEventListener('pointerdown', (e) => {
+      if (!state.img) return;
+      const p = normPoint(e);
+      dragging = true;
+      dx = p.x - state.x;
+      dy = p.y - state.y;
+      canvas.setPointerCapture(e.pointerId);
+    });
+
+    canvas.addEventListener('pointermove', (e) => {
+      if (!dragging) return;
+      const p = normPoint(e);
+      state.x = p.x - dx;
+      state.y = p.y - dy;
+      render();
+    });
+
+    canvas.addEventListener('pointerup', (e) => {
+      dragging = false;
+      canvas.releasePointerCapture(e.pointerId);
+    });
+
+    function resetImageTransform() {
+      state.x = OUTPUT_SIZE / 2;
+      state.y = OUTPUT_SIZE / 2;
+      state.scale = 1;
+      state.rotate = 0;
+      scaleInput.value = '1';
+      rotateInput.value = '0';
+    }
+
+    upload.addEventListener('change', async () => {
+      const file = upload.files?.[0];
+      if (!file) return;
+      const src = URL.createObjectURL(file);
+      state.img = await loadImage(src);
+      URL.revokeObjectURL(src);
+      resetImageTransform();
+      render();
+    });
+
+    scaleInput.addEventListener('input', () => {
+      state.scale = Number(scaleInput.value);
+      render();
+    });
+
+    rotateInput.addEventListener('input', () => {
+      state.rotate = Number(rotateInput.value);
+      render();
+    });
+
+    resetBtn.addEventListener('click', () => {
+      resetImageTransform();
+      render();
+    });
+
+    randomBtn.addEventListener('click', () => {
+      state.frameIndex = Math.floor(Math.random() * frameVariants.length);
+      setActive();
+      render();
+    });
+
+    downloadBtn.addEventListener('click', () => {
+      const out = document.createElement('canvas');
+      out.width = OUTPUT_SIZE;
+      out.height = OUTPUT_SIZE;
+      const og = out.getContext('2d');
+      og.drawImage(canvas, 0, 0);
+      og.globalCompositeOperation = 'destination-in';
+      og.beginPath();
+      og.arc(OUTPUT_SIZE / 2, OUTPUT_SIZE / 2, CIRCLE_RADIUS, 0, Math.PI * 2);
+      og.fill();
+      og.globalCompositeOperation = 'source-over';
+
+      out.toBlob((blob) => {
+        if (!blob) return;
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${t('filePrefix')}-${state.frameIndex + 1}.png`;
+        a.click();
+        URL.revokeObjectURL(url);
+      }, 'image/png');
+    });
+
+    shareBtn.addEventListener('click', () => {
+      const text = encodeURIComponent(t('tweet'));
+      const url = encodeURIComponent(location.href);
+      window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank', 'noopener,noreferrer');
+    });
+
+    langJaBtn.addEventListener('click', () => {
+      state.locale = 'ja';
+      applyLocale();
+    });
+
+    langEnBtn.addEventListener('click', () => {
+      state.locale = 'en';
+      applyLocale();
+    });
+
+    (async () => {
+      frameVariants = await makeFrames();
+      applyLocale();
+    })();
+  </script>
+</body>
+</html>
