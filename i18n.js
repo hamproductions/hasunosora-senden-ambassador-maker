@@ -1,6 +1,6 @@
 window.HASU_I18N = {
   ja: {
-    title: 'HasunosoraSendenAmbassadorMaker',
+    title: '蓮ノ空宣伝アンバサダーメーカー',
     subtitle: 'アップして、選んで、動かして、回して、すぐ投稿。',
     campaignTitleCountdown: '映画公開{days}日前記念 SNSアイコン&フレーム配布',
     campaignTitleLive: '映画公開記念 SNSアイコン&フレーム配布',
@@ -30,7 +30,7 @@ window.HASU_I18N = {
     filePrefix: 'hasunosora-senden-ambassador-maker'
   },
   en: {
-    title: 'HasunosoraSendenAmbassadorMaker',
+    title: 'Hasunosora Senden Ambassador Maker',
     subtitle: 'Upload, pick, drag, rotate, and post fast.',
     campaignTitleCountdown: '{days} Days Before Release: Official SNS Icons & Frames',
     campaignTitleLive: 'Now in Theaters: Official SNS Icons & Frames',
