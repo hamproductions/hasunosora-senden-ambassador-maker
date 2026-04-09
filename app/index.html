@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>HasunosoraSendenAmbassadorMaker</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <main class="app">
+    <header class="hero panel">
+      <div class="hero-main">
+        <h1 data-i18n="title">HasunosoraSendenAmbassadorMaker</h1>
+        <p class="hero-copy" data-i18n="subtitle">Upload. Pick. Drag. Rotate. Post.</p>
+      </div>
+      <div class="lang-switch" role="group" aria-label="Language">
+        <button id="lang-ja" type="button">日本語</button>
+        <button id="lang-en" type="button">English</button>
+      </div>
+    </header>
+
+    <section class="panel campaign">
+      <h2 id="campaign-title">映画公開記念 SNSアイコン&フレーム配布</h2>
+      <p id="campaign-body">公式配布素材から、投稿用画像をすぐ作れます。</p>
+      <div class="campaign-meta">
+        <p class="campaign-url"><a href="https://www.lovelive-anime.jp/hasunosora/news/detail.php?p=01_6037" target="_blank" rel="noopener noreferrer">https://www.lovelive-anime.jp/hasunosora/news/detail.php?p=01_6037</a></p>
+      </div>
+    </section>
+
+    <section class="panel sequence">
+      <div class="sequence-side-top">
+        <article class="step-block" id="step-upload">
+          <div class="step-head"><span>1</span><h3 data-i18n="step1">Import</h3></div>
+          <label class="control-file">
+            <span data-i18n="uploadLabel">Upload image</span>
+            <input id="upload" type="file" accept="image/png,image/jpeg,image/webp" />
+          </label>
+        </article>
+
+        <article class="step-block" id="step-settings">
+          <div class="step-head"><span>2</span><h3 data-i18n="step2">Settings</h3></div>
+          <div class="adjust-grid">
+            <input id="scale" type="range" min="0.4" max="4" step="0.01" value="1" hidden />
+            <label>
+              <span data-i18n="rotation">Rotation</span>
+              <input id="rotate" type="range" min="-180" max="180" step="1" value="0" />
+            </label>
+          </div>
+          <p class="hint" data-i18n="gestureHint">Desktop: drag to move. Mobile: one finger move, two fingers pinch+rotate.</p>
+          <details class="debug-panel" hidden>
+            <summary>Mask Debug</summary>
+            <div class="tone-grid">
+              <label>
+                <span data-i18n="tolMain">Main key tolerance</span>
+                <input id="tol-main" type="range" min="20" max="140" step="1" value="115" />
+                <strong id="tol-main-val">115</strong>
+              </label>
+              <label>
+                <span data-i18n="tolDark">Text dark tolerance</span>
+                <input id="tol-dark" type="range" min="20" max="180" step="1" value="36" />
+                <strong id="tol-dark-val">36</strong>
+              </label>
+              <label>
+                <span data-i18n="tolFlower">Flower tolerance</span>
+                <input id="tol-flower" type="range" min="10" max="220" step="1" value="220" />
+                <strong id="tol-flower-val">220</strong>
+              </label>
+              <label>
+                <span data-i18n="tolFlowerDark">Flower dark tolerance</span>
+                <input id="tol-flower-dark" type="range" min="10" max="220" step="1" value="130" />
+                <strong id="tol-flower-dark-val">130</strong>
+              </label>
+              <label>
+                <span data-i18n="tolResidue">Pink residue pass</span>
+                <input id="tol-residue" type="range" min="0" max="220" step="1" value="220" />
+                <strong id="tol-residue-val">220</strong>
+              </label>
+            </div>
+            <label class="debug-toggle"><input id="debug-enable" type="checkbox" /> Enable drag box on canvas</label>
+            <label class="debug-toggle"><input id="debug-mask" type="checkbox" /> Show mask areas (gray)</label>
+            <label class="debug-toggle"><input id="debug-boxes" type="checkbox" checked /> Show hardcoded boxes</label>
+            <div class="debug-grid">
+              <button id="debug-copy" type="button" class="btn soft">Copy Box</button>
+              <button id="debug-reset" type="button" class="btn soft">Reset Box</button>
+            </div>
+            <pre id="debug-out" class="debug-out">{"x":0.00,"y":0.00,"w":0.00,"h":0.00}</pre>
+          </details>
+        </article>
+      </div>
+
+      <div class="sequence-main">
+        <article class="step-block" id="step-adjust">
+          <div class="step-head"><span>3</span><h3 data-i18n="step3">Preview & Frame</h3></div>
+          <div class="preview-wrap">
+            <canvas id="canvas" width="1600" height="1600"></canvas>
+          </div>
+          <div class="picker-dock">
+            <div id="picker" class="picker" aria-label="Frame picker"></div>
+          </div>
+        </article>
+      </div>
+
+      <div class="sequence-side-bottom">
+        <article class="step-block" id="step-download">
+          <div class="step-head"><span>4</span><h3 data-i18n="step4">Save</h3></div>
+          <button id="download" type="button" class="btn strong" data-i18n="download">Download PNG</button>
+        </article>
+
+        <article class="step-block" id="step-share">
+          <div class="step-head"><span>5</span><h3 data-i18n="step5">Share on X</h3></div>
+          <button id="share" type="button" class="btn blue" data-i18n="share">Share to X</button>
+          <p class="hint" data-i18n="shareHint">X intent cannot attach files automatically. Attach your downloaded PNG in the compose screen.</p>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <script src="./frames-data.js"></script>
+  <script src="./i18n.js"></script>
+  <script src="./app.js"></script>
+</body>
+</html>
