@@ -1,7 +1,6 @@
 (() => {
   const OUTPUT_SIZE = 1600;
   const FRAME_SIZE = 800;
-  const CIRCLE_RADIUS = OUTPUT_SIZE * 0.48;
   const MIN_SCALE = 0.4;
   const MAX_SCALE = 4;
 
@@ -83,6 +82,14 @@
   const SAMPLE_TEMPLATE_DARK = { x: 0.4324, y: 0.0593, w: 0.0172, h: 0.0067 };
   const SAMPLE_TARGET_MAIN = { x: 0.0175, y: 0.5221, w: 0.0189, h: 0.0180 };
   const SAMPLE_TARGET_DARK = { x: 0.4329, y: 0.0588, w: 0.0118, h: 0.0045 };
+
+  function outputSize(target = canvas) {
+    return target.width || OUTPUT_SIZE;
+  }
+
+  function circleRadius(size = outputSize()) {
+    return size * 0.48;
+  }
 
   function t(key) {
     const data = window.HASU_I18N || {};
@@ -793,25 +800,27 @@
   }
 
   function drawUserImage(targetCtx = ctx) {
+    const size = outputSize(targetCtx.canvas);
+    const radius = circleRadius(size);
     if (!state.img) {
       targetCtx.save();
       targetCtx.strokeStyle = 'rgba(134, 125, 117, 0.65)';
       targetCtx.lineWidth = 3;
       targetCtx.setLineDash([18, 14]);
       targetCtx.beginPath();
-      targetCtx.arc(OUTPUT_SIZE / 2, OUTPUT_SIZE / 2, CIRCLE_RADIUS, 0, Math.PI * 2);
+      targetCtx.arc(size / 2, size / 2, radius, 0, Math.PI * 2);
       targetCtx.stroke();
       targetCtx.restore();
       return;
     }
 
-    const fit = Math.max(OUTPUT_SIZE / state.img.width, OUTPUT_SIZE / state.img.height);
+    const fit = Math.max(size / state.img.width, size / state.img.height);
     const w = state.img.width * fit;
     const h = state.img.height * fit;
 
     targetCtx.save();
     targetCtx.beginPath();
-    targetCtx.arc(OUTPUT_SIZE / 2, OUTPUT_SIZE / 2, CIRCLE_RADIUS, 0, Math.PI * 2);
+    targetCtx.arc(size / 2, size / 2, radius, 0, Math.PI * 2);
     targetCtx.clip();
     targetCtx.translate(state.x, state.y);
     targetCtx.rotate((state.rotate * Math.PI) / 180);
@@ -821,6 +830,7 @@
   }
 
   function drawHardcodedBoxes() {
+    const size = outputSize();
     const boxes = [
       { label: 'BOX_LOGO', box: BOX_LOGO, color: '#ff5f87' },
       { label: 'BOX_FLOWER_L', box: BOX_FLOWER_L, color: '#ffd84d' },
@@ -837,10 +847,10 @@
     ctx.textBaseline = 'top';
     for (let n = 0; n < boxes.length; n++) {
       const item = boxes[n];
-      const x = item.box.x * OUTPUT_SIZE;
-      const y = item.box.y * OUTPUT_SIZE;
-      const w = item.box.w * OUTPUT_SIZE;
-      const h = item.box.h * OUTPUT_SIZE;
+      const x = item.box.x * size;
+      const y = item.box.y * size;
+      const w = item.box.w * size;
+      const h = item.box.h * size;
       ctx.strokeStyle = item.color;
       ctx.lineWidth = 3;
       ctx.strokeRect(x, y, w, h);
@@ -848,7 +858,7 @@
       const textW = ctx.measureText(item.label).width;
       const tagW = textW + 12;
       const tagH = 24;
-      const tagX = Math.max(0, Math.min(OUTPUT_SIZE - tagW, x + 2));
+      const tagX = Math.max(0, Math.min(size - tagW, x + 2));
       const tagY = Math.max(0, y - tagH - 2);
       ctx.fillStyle = 'rgba(8, 12, 24, 0.9)';
       ctx.fillRect(tagX, tagY, tagW, tagH);
@@ -862,10 +872,11 @@
   }
 
   function renderFrame(targetCtx = ctx) {
-    targetCtx.clearRect(0, 0, OUTPUT_SIZE, OUTPUT_SIZE);
+    const size = outputSize(targetCtx.canvas);
+    targetCtx.clearRect(0, 0, size, size);
     drawUserImage(targetCtx);
     const frame = frames[state.frameIndex];
-    if (frame) targetCtx.drawImage(frame, 0, 0, OUTPUT_SIZE, OUTPUT_SIZE);
+    if (frame) targetCtx.drawImage(frame, 0, 0, size, size);
   }
 
   function render() {
@@ -897,16 +908,18 @@
         maskPreviewCanvas = c;
         maskPreviewDirty = false;
       }
-      ctx.drawImage(maskPreviewCanvas, 0, 0, OUTPUT_SIZE, OUTPUT_SIZE);
+      const size = outputSize();
+      ctx.drawImage(maskPreviewCanvas, 0, 0, size, size);
     }
     if (state.debug.showBoxes) drawHardcodedBoxes();
 
     if (state.debug.enabled) {
+      const size = outputSize();
       const b = state.debug.box;
-      const x = b.x * OUTPUT_SIZE;
-      const y = b.y * OUTPUT_SIZE;
-      const w = b.w * OUTPUT_SIZE;
-      const h = b.h * OUTPUT_SIZE;
+      const x = b.x * size;
+      const y = b.y * size;
+      const w = b.w * size;
+      const h = b.h * size;
       ctx.save();
       ctx.strokeStyle = '#3cf';
       ctx.lineWidth = 3;
@@ -1014,8 +1027,9 @@
   }
 
   function resetTransform() {
-    state.x = OUTPUT_SIZE / 2;
-    state.y = OUTPUT_SIZE / 2;
+    const size = outputSize();
+    state.x = size / 2;
+    state.y = size / 2;
     state.scale = 1;
     state.rotate = 0;
     scaleInput.value = '1';
@@ -1024,9 +1038,10 @@
 
   function canvasPoint(evt) {
     const rect = canvas.getBoundingClientRect();
+    const size = outputSize();
     return {
-      x: ((evt.clientX - rect.left) / rect.width) * OUTPUT_SIZE,
-      y: ((evt.clientY - rect.top) / rect.height) * OUTPUT_SIZE
+      x: ((evt.clientX - rect.left) / rect.width) * size,
+      y: ((evt.clientY - rect.top) / rect.height) * size
     };
   }
 
@@ -1071,8 +1086,9 @@
   canvas.addEventListener('pointerdown', (evt) => {
     if (state.debug.enabled) {
       const p = canvasPoint(evt);
+      const size = outputSize();
       state.debug.dragging = true;
-      state.debug.start = { x: p.x / OUTPUT_SIZE, y: p.y / OUTPUT_SIZE };
+      state.debug.start = { x: p.x / size, y: p.y / size };
       state.debug.box = { x: state.debug.start.x, y: state.debug.start.y, w: 0.001, h: 0.001 };
       updateDebugOut();
       render();
@@ -1103,8 +1119,9 @@
   canvas.addEventListener('pointermove', (evt) => {
     if (state.debug.enabled && state.debug.dragging && state.debug.start) {
       const p = canvasPoint(evt);
-      const x1 = p.x / OUTPUT_SIZE;
-      const y1 = p.y / OUTPUT_SIZE;
+      const size = outputSize();
+      const x1 = p.x / size;
+      const y1 = p.y / size;
       const x0 = state.debug.start.x;
       const y0 = state.debug.start.y;
       state.debug.box = {
@@ -1179,6 +1196,8 @@
     const src = URL.createObjectURL(file);
     state.img = await loadImage(src);
     URL.revokeObjectURL(src);
+    canvas.width = OUTPUT_SIZE;
+    canvas.height = OUTPUT_SIZE;
     resetTransform();
     render();
   });
